@@ -39,6 +39,15 @@ static void draw_triangles(std::vector<model::Face::TriangleInfo> const& triangl
     glEnd();
 }
 
+static void draw_edges(std::vector<model::Face::EdgeInfo> const& edges) {
+    glBegin(GL_LINES);
+    for (auto const& edge : edges) {
+        glVertex3d(edge.positions[0][0], edge.positions[0][1], edge.positions[0][2]);
+        glVertex3d(edge.positions[1][0], edge.positions[1][1], edge.positions[1][2]);
+    }
+    glEnd();
+}
+
 void MainView::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -61,6 +70,11 @@ void MainView::paintGL() {
     for (auto const& face : m_mesh->faces)
         face.split_to_triangles(triangles, *m_mesh);
     draw_triangles(triangles);
+
+    std::vector<model::Face::EdgeInfo> edges;
+    for (auto const& face : m_mesh->faces)
+        face.edges_info(edges, *m_mesh);
+    draw_edges(edges);
 
     glFlush();
 }

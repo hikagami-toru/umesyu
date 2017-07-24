@@ -39,7 +39,12 @@ struct Face {
         std::array<vector3d, 3> positions;
         vector3d normal;
     };
+    struct EdgeInfo {
+        std::array<vector3d, 2> positions;
+    };
+
     void split_to_triangles(std::vector<TriangleInfo>&, Mesh const&) const;
+    void edges_info(std::vector<EdgeInfo>&, Mesh const&) const;
 };
 
 struct Mesh {

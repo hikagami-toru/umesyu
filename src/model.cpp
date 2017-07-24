@@ -70,3 +70,13 @@ void model::Face::split_to_triangles(std::vector<TriangleInfo>& triangles, Mesh 
         break;
     }
 }
+
+void model::Face::edges_info(std::vector<EdgeInfo>& edges, Mesh const& mesh) const {
+    for (size_t i = 0; i < node_indices.size(); ++i) {
+        size_t next = (i+1) % node_indices.size();
+        edges.push_back(EdgeInfo{
+            mesh.nodes[node_indices[i].data].position,
+            mesh.nodes[node_indices[next].data].position
+        });
+    }
+}
