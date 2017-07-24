@@ -29,12 +29,14 @@ void MainView::initializeGL() {
     glLightfv(GL_LIGHT1, GL_POSITION, light_pos2);
 }
 
-static vector3d calc_triangle_normal(model::Face const& face, model::Mesh const& mesh) {
-    auto const& nodes = mesh.nodes;
-    auto const& indices = face.node_indices;
-    auto a = nodes[indices[1].data].position - nodes[indices[0].data].position;
-    auto b = nodes[indices[2].data].position - nodes[indices[0].data].position;
-    return cross(a, b).normal();
+static void draw_triangles(std::vector<model::Face::TriangleInfo> const& triangles) {
+    glBegin(GL_TRIANGLES);
+    for (auto const& triangle : triangles) {
+        glNormal3dv(triangle.normal.data());
+        for (auto const& pos : triangle.positions)
+            glVertex3d(pos[0], pos[1], pos[2]);
+    }
+    glEnd();
 }
 
 void MainView::paintGL() {
@@ -55,28 +57,11 @@ void MainView::paintGL() {
     if (!m_mesh)
         return;
 
-    for (auto const& face : m_mesh->faces) {
-        switch (face.type) {
-        case model::Face::Type::Triangle:
-            glBegin(GL_TRIANGLES);
-            glNormal3dv(calc_triangle_normal(face, *m_mesh).data());
-            for (auto const& node_id : face.node_indices) {
-                auto const& pos = m_mesh->nodes[node_id.data].position;
-                glVertex3d(pos[0], pos[1], pos[2]);
-            }
-            glEnd();
-            break;
-        case model::Face::Type::Rectangle:
-            glBegin(GL_QUADS);
-            glNormal3dv(calc_triangle_normal(face, *m_mesh).data());
-            for (auto const& node_id : face.node_indices) {
-                auto const& pos = m_mesh->nodes[node_id.data].position;
-                glVertex3d(pos[0], pos[1], pos[2]);
-            }
-            glEnd();
-            break;
-        }
-    }
+    std::vector<model::Face::TriangleInfo> triangles;
+    for (auto const& face : m_mesh->faces)
+        face.split_to_triangles(triangles, *m_mesh);
+    draw_triangles(triangles);
+
     glFlush();
 }
 

@@ -9,6 +9,8 @@
 
 namespace model {
 
+struct Mesh;
+
 struct Node {
     vector3d position;
     Index<Node> index;
@@ -32,6 +34,12 @@ struct Face {
     Type type;
     Index<Face> index;
     std::vector<Index<Node>> node_indices;
+
+    struct TriangleInfo {
+        std::array<vector3d, 3> positions;
+        vector3d normal;
+    };
+    void split_to_triangles(std::vector<TriangleInfo>&, Mesh const&) const;
 };
 
 struct Mesh {
