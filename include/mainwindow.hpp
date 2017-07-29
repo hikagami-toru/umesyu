@@ -17,6 +17,9 @@ public:
 private:
     void dragEnterEvent(QDragEnterEvent*);
     void dropEvent(QDropEvent*) override;
+
+private slots:
+    void onOpenFile();
 private:
     Ui::MainWindow *ui;
 };

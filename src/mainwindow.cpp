@@ -1,6 +1,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QFileDialog>
 
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
@@ -29,4 +30,12 @@ void MainWindow::dropEvent(QDropEvent* e) {
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onOpenFile() {
+    auto filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("3D Mesh (*.off)"));
+    if (!filename.isNull()) {
+        ui->mainview->mesh() = std::make_unique<model::Mesh>(model::Mesh::load(filename.toStdString().c_str()));
+        ui->mainview->repaint();
+    }
 }
